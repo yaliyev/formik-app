@@ -1,7 +1,39 @@
 import React from 'react'
 import { CContainer, CRow, CCol, CForm, CFormSelect, CFormInput,CFormCheck,CButton  } from '@coreui/react'
 import '@coreui/coreui/dist/css/coreui.min.css'
+import { useFormik } from 'formik'
+import { Field } from 'formik'
+import { addProduct } from '../services/products_request'
 const AddProductForm = () => {
+  
+  const formik = useFormik({
+    initialValues:{
+      'category':'1',
+      'name':'',
+      'unitPrice':'',
+      'unitsInStock':'',
+      'isDiscounted':'false',
+      'quantityPerUnit':''
+    },
+    onSubmit: async(values,actions)=>{
+     
+      let discontinuedBool = null;
+      if(values.isDiscounted === 'false'){
+        discontinuedBool = false;
+      } else{
+        discontinuedBool = true;
+      }
+      let product = {
+        categoryId: values.category,
+        name: values.name,
+        unitPrice: values.unitPrice,
+        unitsInStock: values.unitsInStock,
+        discontinued: discontinuedBool,
+        quantityPerUnit: values.quantityPerUnit
+      }
+      await addProduct(product);
+    }
+  })
   return (
     <CContainer>
       <CRow className='d-flex justify-content-center'>
@@ -12,10 +44,10 @@ const AddProductForm = () => {
           <h2>Product Add Form</h2>
         </CCol>
       </CRow>
-      <CForm>
+      <CForm onSubmit={formik.handleSubmit}>
         <CRow className='d-flex justify-content-center  my-3'>
           <CCol xs={8}>
-            <CFormSelect
+            <CFormSelect onChange={formik.handleChange} name='category'  value={formik.values.category}
               aria-label="Default select example"
               options={[
                 { label: 'Meat/Poultry', value: '1' },
@@ -32,31 +64,43 @@ const AddProductForm = () => {
         </CRow>
         <CRow className='d-flex justify-content-between  my-3'>
           <CCol xs={3}>
-            <CFormInput placeholder='Name' />
+            <CFormInput onChange={formik.handleChange} name='name' value={formik.values.name} placeholder='Name' />
           </CCol>
           <CCol xs={3}>
-            <CFormInput placeholder='Unit Price' />
+            <CFormInput onChange={formik.handleChange} name='unitPrice' value={formik.values.unitPrice} placeholder='Unit Price' />
           </CCol>
 
         </CRow>
         <CRow className='d-flex justify-content-between  my-3'>
           <CCol xs={3}>
-            <CFormInput placeholder='Units in stock' />
+            <CFormInput onChange={formik.handleChange} name='unitsInStock' value={formik.values.unitsInStock} placeholder='Units in stock' />
           </CCol>
           <CCol xs={3}>
-          <CFormCheck  label="isDiscounted"/>
+          
+          <input className='me-2' type='checkbox' onChange={()=>{ 
+            let a = formik.values.isDiscounted; 
+            if(a == 'false'){
+              formik.setFieldValue('isDiscounted','true')
+            }else{
+              formik.setFieldValue('isDiscounted','false')
+            }
+            
+            }}  value={formik.values.isDiscounted} name='isDiscounted'   label="isDiscounted"/>
+            <span>isDiscounted</span>
+          
+          
           </CCol>
 
         </CRow>
         <CRow className='d-flex justify-content-center  my-3'>
         <CCol xs={4}>
-            <CFormInput placeholder='Quantity per  Unit' />
+            <CFormInput onChange={formik.handleChange} name='quantityPerUnit' value={formik.values.quantityPerUnit} placeholder='Quantity per  Unit' />
           </CCol>
 
         </CRow>
         <CRow className='d-flex justify-content-center  my-4'>
         <CCol xs={4}>
-            <CButton className='btn btn-success text-white w-100'>ADD PRODUCT TO API</CButton>
+            <CButton type='submit' className='btn btn-success text-white w-100'>ADD PRODUCT TO API</CButton>
           </CCol>
 
         </CRow>
