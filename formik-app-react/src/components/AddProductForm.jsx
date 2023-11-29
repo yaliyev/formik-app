@@ -4,6 +4,7 @@ import '@coreui/coreui/dist/css/coreui.min.css'
 import { useFormik } from 'formik'
 import { Field } from 'formik'
 import { addProduct } from '../services/products_request'
+import { addProductSchema } from '../validation/addProductValidation'
 const AddProductForm = () => {
   
   const formik = useFormik({
@@ -16,7 +17,6 @@ const AddProductForm = () => {
       'quantityPerUnit':''
     },
     onSubmit: async(values,actions)=>{
-     
       let discontinuedBool = null;
       if(values.isDiscounted === 'false'){
         discontinuedBool = false;
@@ -32,7 +32,9 @@ const AddProductForm = () => {
         quantityPerUnit: values.quantityPerUnit
       }
       await addProduct(product);
-    }
+      actions.resetForm();
+    },
+    validationSchema: addProductSchema
   })
   return (
     <CContainer>
@@ -65,15 +67,19 @@ const AddProductForm = () => {
         <CRow className='d-flex justify-content-between  my-3'>
           <CCol xs={3}>
             <CFormInput onChange={formik.handleChange} name='name' value={formik.values.name} placeholder='Name' />
+            {(formik.errors.name)?<div className='text-danger'>{formik.errors.name}</div>:<></>}
+            
           </CCol>
           <CCol xs={3}>
             <CFormInput onChange={formik.handleChange} name='unitPrice' value={formik.values.unitPrice} placeholder='Unit Price' />
+            {(formik.errors.unitPrice)?<div className='text-danger'>{formik.errors.unitPrice}</div>:<></>}
           </CCol>
 
         </CRow>
         <CRow className='d-flex justify-content-between  my-3'>
           <CCol xs={3}>
             <CFormInput onChange={formik.handleChange} name='unitsInStock' value={formik.values.unitsInStock} placeholder='Units in stock' />
+            {(formik.errors.unitsInStock)?<div className='text-danger'>{formik.errors.unitsInStock}</div>:<></>}
           </CCol>
           <CCol xs={3}>
           
@@ -95,6 +101,7 @@ const AddProductForm = () => {
         <CRow className='d-flex justify-content-center  my-3'>
         <CCol xs={4}>
             <CFormInput onChange={formik.handleChange} name='quantityPerUnit' value={formik.values.quantityPerUnit} placeholder='Quantity per  Unit' />
+            {(formik.errors.quantityPerUnit)?<div className='text-danger'>{formik.errors.quantityPerUnit}</div>:<></>}
           </CCol>
 
         </CRow>
